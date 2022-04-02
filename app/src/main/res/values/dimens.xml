@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="login_field_layout_margin_start">8dp</dimen>
+    <dimen name="login_field_layout_margin_top">24dp</dimen>
+    <dimen name="login_field_layout_margin_end">8dp</dimen>
+    <dimen name="password_field_layout_margin_start">8dp</dimen>
+    <dimen name="password_field_layout_margin_top">24dp</dimen>
+    <dimen name="password_field_layout_margin_end">8dp</dimen>
+    <dimen name="login_btn_margin_top">24dp</dimen>
+    <dimen name="login_activity_container_padding">8dp</dimen>
+</resources>
