@@ -10,10 +10,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.LoginSimulationApp">
         <activity
-            android:name=".ui.RegisterActivity"
+            android:name=".ui.registrationscreen.RegisterActivity"
             android:exported="false" />
         <activity
-            android:name=".LoginActivity"
+            android:name=".ui.loginscreen.LoginActivity"
             android:exported="true"
             android:windowSoftInputMode="stateHidden">
             <intent-filter>

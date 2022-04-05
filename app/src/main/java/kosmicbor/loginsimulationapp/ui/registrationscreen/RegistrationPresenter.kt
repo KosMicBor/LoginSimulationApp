@@ -1,9 +1,8 @@
-package kosmicbor.loginsimulationapp.presenters
+package kosmicbor.loginsimulationapp.ui.registrationscreen
 
 import android.os.Handler
 import android.os.Looper
-import kosmicbor.loginsimulationapp.RegistrationContract
-import kosmicbor.loginsimulationapp.domain.DatabaseRepository
+import kosmicbor.loginsimulationapp.data.DatabaseApi
 
 class RegistrationPresenter : RegistrationContract.RegistrationPresenter {
 
@@ -36,11 +35,11 @@ class RegistrationPresenter : RegistrationContract.RegistrationPresenter {
 
 
                     if (nickname.isNotEmpty() && newLogin.isNotEmpty() && newPassword.isNotEmpty()) {
-                        DatabaseRepository.addNewUserRequest(
+                        DatabaseApi.addNewUserRequest(
                             nickname,
                             newLogin,
                             newPassword,
-                            object : DatabaseRepository.OnUserCreateListener {
+                            object : DatabaseApi.OnUserCreateListener {
                                 override fun createSuccess() {
                                     regView?.setSuccess()
                                 }

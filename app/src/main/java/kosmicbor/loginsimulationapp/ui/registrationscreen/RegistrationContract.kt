@@ -1,6 +1,4 @@
-package kosmicbor.loginsimulationapp
-
-import kosmicbor.loginsimulationapp.domain.DatabaseRepository
+package kosmicbor.loginsimulationapp.ui.registrationscreen
 
 class RegistrationContract {
 

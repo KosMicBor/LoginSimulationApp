@@ -1,9 +1,8 @@
-package kosmicbor.loginsimulationapp.presenters
+package kosmicbor.loginsimulationapp.ui.loginscreen
 
 import android.os.Handler
 import android.os.Looper
-import kosmicbor.loginsimulationapp.LoginContract
-import kosmicbor.loginsimulationapp.domain.DatabaseRepository
+import kosmicbor.loginsimulationapp.data.DatabaseApi
 
 class LoginPresenter : LoginContract.Presenter {
 
@@ -32,10 +31,10 @@ class LoginPresenter : LoginContract.Presenter {
                 loginView?.showProgress()
             }
             Thread.sleep(LOGIN_DELAY)
-            DatabaseRepository.checkUserCredentialsRequest(
+            DatabaseApi.checkUserCredentialsRequest(
                 login,
                 password,
-                object : DatabaseRepository.OnUserLogInListener {
+                object : DatabaseApi.OnUserLogInListener {
                     override fun logInSuccess() {
 
                         handler.post {
@@ -60,10 +59,10 @@ class LoginPresenter : LoginContract.Presenter {
         Thread {
             handler.post {
 
-                DatabaseRepository.changeUserPasswordRequest(
+                DatabaseApi.changeUserPasswordRequest(
                     login,
                     newPassword,
-                    object : DatabaseRepository.OnChangePasswordListener {
+                    object : DatabaseApi.OnChangePasswordListener {
                         override fun changeSuccess() {
                             loginView?.showMessage("Password changed")
                         }
@@ -83,8 +82,8 @@ class LoginPresenter : LoginContract.Presenter {
                 loginView?.showProgress()
                 Thread.sleep(VERIFY_DELAY)
 
-                DatabaseRepository.verifyEmail(loginEmail, object :
-                    DatabaseRepository.OnVerifyEmailListener {
+                DatabaseApi.verifyEmail(loginEmail, object :
+                    DatabaseApi.OnVerifyEmailListener {
                     override fun verifySuccess() {
                         loginView?.showStandardScreen()
                         loginView?.enableDialogPasswordChangeFields()

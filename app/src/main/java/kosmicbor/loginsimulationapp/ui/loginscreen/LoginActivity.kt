@@ -1,4 +1,4 @@
-package kosmicbor.loginsimulationapp
+package kosmicbor.loginsimulationapp.ui.loginscreen
 
 import android.app.Dialog
 import android.content.Context
@@ -12,9 +12,9 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
+import kosmicbor.loginsimulationapp.R
 import kosmicbor.loginsimulationapp.databinding.ActivityLoginBinding
-import kosmicbor.loginsimulationapp.presenters.LoginPresenter
-import kosmicbor.loginsimulationapp.ui.RegisterActivity
+import kosmicbor.loginsimulationapp.ui.registrationscreen.RegisterActivity
 
 class LoginActivity : AppCompatActivity(), LoginContract.LoginView {
 
@@ -26,6 +26,8 @@ class LoginActivity : AppCompatActivity(), LoginContract.LoginView {
         super.onCreate(savedInstanceState)
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        dialog = Dialog(this)
 
         presenter = restorePresenter()
 
@@ -89,7 +91,7 @@ class LoginActivity : AppCompatActivity(), LoginContract.LoginView {
     }
 
     override fun showPasswordChangeDialog() {
-        dialog = Dialog(this)
+
         dialog.apply {
             requestWindowFeature(Window.FEATURE_NO_TITLE)
             setContentView(R.layout.bottomsheet_password_change)

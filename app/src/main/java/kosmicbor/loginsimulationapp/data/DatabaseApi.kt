@@ -1,6 +1,8 @@
-package kosmicbor.loginsimulationapp.domain
+package kosmicbor.loginsimulationapp.data
 
-object DatabaseRepository : LoginRepository, RegistrationRepository {
+import kosmicbor.loginsimulationapp.domain.User
+
+object DatabaseApi : LoginApi, RegistrationApi {
 
     private val usersList: MutableList<User> = mutableListOf()
 

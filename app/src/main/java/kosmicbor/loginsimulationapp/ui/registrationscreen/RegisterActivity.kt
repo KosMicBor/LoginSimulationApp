@@ -1,4 +1,4 @@
-package kosmicbor.loginsimulationapp.ui
+package kosmicbor.loginsimulationapp.ui.registrationscreen
 
 import android.content.Context
 import android.content.Intent
@@ -10,12 +10,8 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
-import kosmicbor.loginsimulationapp.LoginActivity
-import kosmicbor.loginsimulationapp.LoginContract
-import kosmicbor.loginsimulationapp.RegistrationContract
+import kosmicbor.loginsimulationapp.ui.loginscreen.LoginActivity
 import kosmicbor.loginsimulationapp.databinding.ActivityRegisterBinding
-import kosmicbor.loginsimulationapp.presenters.LoginPresenter
-import kosmicbor.loginsimulationapp.presenters.RegistrationPresenter
 
 class RegisterActivity : AppCompatActivity(), RegistrationContract.RegistrationView {
 
