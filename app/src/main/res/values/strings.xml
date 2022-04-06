@@ -1,3 +1,16 @@
 <resources>
     <string name="app_name">Login Simulation App</string>
+    <string name="forgot_password_btn_text"><u>Forgot password?</u></string>
+    <string name="login_field_hint">Login email</string>
+    <string name="password_field_hint">Password</string>
+    <string name="login_btn_text">Log in</string>
+    <string name="create_account_btn_text">create account</string>
+    <string name="password_repeat_field_hint">Repeat password</string>
+    <string name="register_btn_text">Register</string>
+    <string name="name_field_hint">Your Nickname</string>
+    <string name="send_verify_email_btn_text">Send verify email</string>
+    <string name="enter_old_password_hint">Enter old password</string>
+    <string name="enter_new_password_hint">Enter new password</string>
+    <string name="change_password_btn_text">Change password</string>
+    <string name="Password_changed_message">Password changed</string>
 </resources>

@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/register_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="@dimen/login_activity_container_padding"
+    tools:context=".ui.registrationscreen.RegisterActivity">
+
+    <ProgressBar
+        android:id="@+id/register_screen_progressbar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:indeterminateTint="@color/royal_blue"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/new_name_field_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/login_field_layout_margin_top"
+        android:hint="@string/name_field_hint"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/new_name_field_edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:inputType="text" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/new_login_field_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/login_field_layout_margin_top"
+        android:hint="@string/login_field_hint"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/new_name_field_layout">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/new_login_field_edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:inputType="textEmailAddress" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/new_password_field_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/password_field_layout_margin_top"
+        android:hint="@string/password_field_hint"
+        app:layout_constraintEnd_toEndOf="@id/new_login_field_layout"
+        app:layout_constraintStart_toStartOf="@id/new_login_field_layout"
+        app:layout_constraintTop_toBottomOf="@id/new_login_field_layout">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/new_password_field_edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:inputType="textPassword" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/new_password_repeat_field_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/password_field_layout_margin_top"
+        android:hint="@string/password_repeat_field_hint"
+        app:layout_constraintEnd_toEndOf="@id/new_password_field_layout"
+        app:layout_constraintStart_toStartOf="@id/new_password_field_layout"
+        app:layout_constraintTop_toBottomOf="@id/new_password_field_layout">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/new_password_repeat_field_edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:inputType="textPassword" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/register_btn"
+        android:layout_width="@dimen/_0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/login_btn_margin_top"
+        android:text="@string/register_btn_text"
+        app:layout_constraintEnd_toEndOf="@+id/new_password_repeat_field_layout"
+        app:layout_constraintStart_toStartOf="@id/new_password_repeat_field_layout"
+        app:layout_constraintTop_toBottomOf="@id/new_password_repeat_field_layout" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
