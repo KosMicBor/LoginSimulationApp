@@ -2,7 +2,7 @@ package kosmicbor.loginsimulationapp.ui.loginscreen
 
 import android.os.Handler
 import android.os.Looper
-import kosmicbor.loginsimulationapp.data.DatabaseApi
+import kosmicbor.loginsimulationapp.data.MockDatabaseApiImpl
 
 class LoginPresenter : LoginContract.Presenter {
 
@@ -31,10 +31,10 @@ class LoginPresenter : LoginContract.Presenter {
                 loginView?.showProgress()
             }
             Thread.sleep(LOGIN_DELAY)
-            DatabaseApi.checkUserCredentialsRequest(
+            MockDatabaseApiImpl.checkUserCredentialsRequest(
                 login,
                 password,
-                object : DatabaseApi.OnUserLogInListener {
+                object : MockDatabaseApiImpl.OnUserLogInListener {
                     override fun logInSuccess() {
 
                         handler.post {
@@ -59,10 +59,10 @@ class LoginPresenter : LoginContract.Presenter {
         Thread {
             handler.post {
 
-                DatabaseApi.changeUserPasswordRequest(
+                MockDatabaseApiImpl.changeUserPasswordRequest(
                     login,
                     newPassword,
-                    object : DatabaseApi.OnChangePasswordListener {
+                    object : MockDatabaseApiImpl.OnChangePasswordListener {
                         override fun changeSuccess() {
                             loginView?.showMessage("Password changed")
                         }
@@ -82,8 +82,8 @@ class LoginPresenter : LoginContract.Presenter {
                 loginView?.showProgress()
                 Thread.sleep(VERIFY_DELAY)
 
-                DatabaseApi.verifyEmail(loginEmail, object :
-                    DatabaseApi.OnVerifyEmailListener {
+                MockDatabaseApiImpl.verifyEmail(loginEmail, object :
+                    MockDatabaseApiImpl.OnVerifyEmailListener {
                     override fun verifySuccess() {
                         loginView?.showStandardScreen()
                         loginView?.enableDialogPasswordChangeFields()
