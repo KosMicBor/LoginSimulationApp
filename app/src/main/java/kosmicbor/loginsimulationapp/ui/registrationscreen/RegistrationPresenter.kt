@@ -2,9 +2,12 @@ package kosmicbor.loginsimulationapp.ui.registrationscreen
 
 import android.os.Handler
 import android.os.Looper
-import kosmicbor.loginsimulationapp.data.MockDatabaseApiImpl
+import kosmicbor.loginsimulationapp.data.RegistrationInteractorImpl
+import kosmicbor.loginsimulationapp.domain.RegistrationInteractor
 
-class RegistrationPresenter : RegistrationContract.RegistrationPresenter {
+class RegistrationPresenter(
+    private val interactor: RegistrationInteractor
+) : RegistrationContract.RegistrationPresenter {
 
     private val handler = Handler(Looper.myLooper() ?: Looper.getMainLooper())
     private var regView: RegistrationContract.RegistrationView? = null
@@ -25,42 +28,52 @@ class RegistrationPresenter : RegistrationContract.RegistrationPresenter {
         newPasswordRepeat: String
     ) {
 
-//        Thread {
-//
-//            handler.post {
-//                regView?.showProgress()
-//
-//
-//                if (checkPasswordsConformity(newPassword, newPasswordRepeat)) {
-//
-//
-//                    if (nickname.isNotEmpty() && newLogin.isNotEmpty() && newPassword.isNotEmpty()) {
-//                        MockDatabaseApiImpl.addNewUserRequest(
-//                            nickname,
-//                            newLogin,
-//                            newPassword,
-//                            object : MockDatabaseApiImpl.OnUserCreateListener {
-//                                override fun createSuccess() {
-//                                    regView?.setSuccess()
-//                                }
-//
-//                                override fun createError(error: String) {
-//                                    regView?.setError(error)
-//                                }
-//
-//                            })
-//
-//                    } else {
-//                        regView?.showStandardScreen()
-//                        regView?.setError("Please, fill all fields!")
-//                    }
-//
-//                } else {
-//                    regView?.showStandardScreen()
-//                    regView?.setError("Passwords don't match!")
-//                }
-//            }
-//        }.start()
+        Thread {
+
+            handler.post {
+                regView?.showProgress()
+
+                if (checkPasswordsConformity(newPassword, newPasswordRepeat)) {
+
+
+                    if (nickname.isNotEmpty() && newLogin.isNotEmpty() && newPassword.isNotEmpty()) {
+                        interactor.registerNewUser(
+                            nickname,
+                            newLogin,
+                            newPassword,
+                            object : RegistrationInteractorImpl.RegisterNewUserCallback {
+
+                                override fun onSuccess() {
+                                    regView?.apply {
+                                        showStandardScreen()
+                                        setSuccess()
+                                    }
+                                }
+
+                                override fun onError(error: String) {
+                                    regView?.apply {
+                                        showStandardScreen()
+                                        setError(error)
+                                    }
+                                }
+
+                                override fun onLoading() {
+                                    regView?.showProgress()
+                                }
+
+                            })
+
+                    } else {
+                        regView?.showStandardScreen()
+                        regView?.setError("Please, fill all fields!")
+                    }
+
+                } else {
+                    regView?.showStandardScreen()
+                    regView?.setError("Passwords don't match!")
+                }
+            }
+        }.start()
     }
 
     private fun checkPasswordsConformity(newPassword: String, newPasswordRepeat: String): Boolean {

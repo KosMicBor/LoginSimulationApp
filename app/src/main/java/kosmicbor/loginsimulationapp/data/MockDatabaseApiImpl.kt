@@ -59,6 +59,7 @@ class MockDatabaseApiImpl : LoginApi, RegistrationApi {
 
     override fun verifyEmail(loginEmail: String, onVerifyEmailListener: OnVerifyEmailListener) {
         usersList.forEach {
+
             if (it.userLogin == loginEmail) {
                 onVerifyEmailListener.verifySuccess()
                 return

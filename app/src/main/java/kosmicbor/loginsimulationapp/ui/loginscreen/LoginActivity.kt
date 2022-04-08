@@ -6,8 +6,12 @@ import android.content.Intent
 import android.graphics.Color
 import android.graphics.Rect
 import android.os.Bundle
+import android.provider.CalendarContract
+import android.provider.ContactsContract
+import android.util.Log
 import android.view.*
 import android.view.inputmethod.InputMethodManager
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.snackbar.Snackbar
@@ -16,22 +20,24 @@ import kosmicbor.loginsimulationapp.R
 import kosmicbor.loginsimulationapp.app
 import kosmicbor.loginsimulationapp.databinding.ActivityLoginBinding
 import kosmicbor.loginsimulationapp.ui.registrationscreen.RegisterActivity
+import java.util.*
 
 class LoginActivity : AppCompatActivity(), LoginContract.LoginView {
 
     private lateinit var binding: ActivityLoginBinding
     private lateinit var presenter: LoginPresenter
     private lateinit var dialog: Dialog
-    private var snackbar: Snackbar? = null
+    private var verifySnackbar: Snackbar? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        dialog = Dialog(this)
-
-        snackbar = dialog.currentFocus?.let { Snackbar.make(it, "Verifying...", Snackbar.LENGTH_INDEFINITE) }
+        dialog = Dialog(this).apply {
+            requestWindowFeature(Window.FEATURE_NO_TITLE)
+            setContentView(R.layout.bottomsheet_password_change)
+        }
 
         presenter = restorePresenter()
 
@@ -65,7 +71,10 @@ class LoginActivity : AppCompatActivity(), LoginContract.LoginView {
 
     override fun setError(error: String) {
         if (dialog.isShowing) {
-            dialog.currentFocus?.let { Snackbar.make(it, error, Snackbar.LENGTH_SHORT).show() }
+            dialog.currentFocus?.let {
+                Log.d("FOCUS", it.accessibilityClassName.toString())
+                Snackbar.make(it, error, Snackbar.LENGTH_SHORT).show()
+            }
         } else {
             showStandardScreen()
             Snackbar.make(binding.root, error, Snackbar.LENGTH_SHORT).show()
@@ -83,6 +92,24 @@ class LoginActivity : AppCompatActivity(), LoginContract.LoginView {
         }
     }
 
+    override fun showDialogVerifyProgress() {
+
+        Log.d("TIME", Calendar.getInstance().time.toString())
+
+        if (dialog.isShowing) {
+
+            dialog.currentFocus?.let {
+                verifySnackbar = Snackbar.make(
+                    it.rootView,
+                    "Verifying...",
+                    Snackbar.LENGTH_INDEFINITE
+                )
+
+                verifySnackbar?.show()
+            }
+        }
+    }
+
     override fun showStandardScreen() {
         binding.apply {
             loginFieldLayout.visibility = View.VISIBLE
@@ -97,8 +124,6 @@ class LoginActivity : AppCompatActivity(), LoginContract.LoginView {
     override fun showPasswordChangeDialog() {
 
         dialog.apply {
-            requestWindowFeature(Window.FEATURE_NO_TITLE)
-            setContentView(R.layout.bottomsheet_password_change)
 
             val loginEmail =
                 dialog.findViewById<TextInputEditText>(R.id.bottom_sheet_login_field_edit_text)
@@ -106,7 +131,6 @@ class LoginActivity : AppCompatActivity(), LoginContract.LoginView {
 
             verifyButton.setOnClickListener {
                 presenter.onVerifyEmail(loginEmail.text.toString())
-                snackbar?.show()
             }
 
             window?.apply {
@@ -129,14 +153,20 @@ class LoginActivity : AppCompatActivity(), LoginContract.LoginView {
         val changePasswordButton = dialog.findViewById<MaterialButton>(R.id.change_password_button)
 
         verifyButton.isEnabled = false
-        snackbar?.dismiss()
+        Log.d("TIME", Calendar.getInstance().time.toString())
+        verifySnackbar?.dismiss()
         newPassword.isEnabled = true
         changePasswordButton.isEnabled = true
 
         changePasswordButton.setOnClickListener {
-            hideKeyboard(dialog.currentFocus)
-            dialog.dismiss()
             presenter.onPasswordChanged(loginEmail.text.toString(), newPassword.text.toString())
+            hideKeyboard(dialog.currentFocus)
+            verifyButton.isEnabled = true
+            newPassword.isEnabled = false
+            changePasswordButton.isEnabled = false
+            loginEmail.text?.clear()
+            newPassword.text?.clear()
+            dialog.dismiss()
         }
     }
 

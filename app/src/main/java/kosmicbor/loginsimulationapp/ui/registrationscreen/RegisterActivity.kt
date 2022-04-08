@@ -10,6 +10,7 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
+import kosmicbor.loginsimulationapp.app
 import kosmicbor.loginsimulationapp.ui.loginscreen.LoginActivity
 import kosmicbor.loginsimulationapp.databinding.ActivityRegisterBinding
 
@@ -25,7 +26,7 @@ class RegisterActivity : AppCompatActivity(), RegistrationContract.RegistrationV
 
         setContentView(binding.root)
 
-        presenter = RegistrationPresenter().apply {
+        presenter = RegistrationPresenter(app.registrationInteractor).apply {
             onAttach(this@RegisterActivity)
         }
 

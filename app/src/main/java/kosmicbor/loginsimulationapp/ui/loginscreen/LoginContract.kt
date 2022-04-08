@@ -13,6 +13,7 @@ class LoginContract {
         fun setSuccess()
         fun setError(error: String)
         fun showProgress()
+        fun showDialogVerifyProgress()
         fun showStandardScreen()
         fun showPasswordChangeDialog()
         fun enableDialogPasswordChangeFields()

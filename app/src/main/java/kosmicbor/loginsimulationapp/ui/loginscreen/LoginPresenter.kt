@@ -2,8 +2,8 @@ package kosmicbor.loginsimulationapp.ui.loginscreen
 
 import android.os.Handler
 import android.os.Looper
+import androidx.annotation.MainThread
 import kosmicbor.loginsimulationapp.data.LoginInteractorImpl
-import kosmicbor.loginsimulationapp.data.MockDatabaseApiImpl
 import kosmicbor.loginsimulationapp.domain.LoginInteractor
 
 class LoginPresenter(
@@ -79,8 +79,11 @@ class LoginPresenter(
             })
     }
 
+    @MainThread
     override fun onVerifyEmail(loginEmail: String) {
+
         interactor.verifyEmail(loginEmail, object : LoginInteractorImpl.VerifyEmailCallback {
+
             override fun onSuccess(message: String) {
                 loginView?.apply {
                     showStandardScreen()
@@ -93,7 +96,7 @@ class LoginPresenter(
             }
 
             override fun onLoading() {
-                //Nothing to do
+                loginView?.showDialogVerifyProgress()
             }
 
         })

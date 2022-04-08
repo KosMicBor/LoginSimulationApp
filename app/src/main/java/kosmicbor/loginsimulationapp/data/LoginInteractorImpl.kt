@@ -1,6 +1,7 @@
 package kosmicbor.loginsimulationapp.data
 
 import android.os.Handler
+import android.util.Log
 import kosmicbor.loginsimulationapp.domain.LoginInteractor
 import kosmicbor.loginsimulationapp.ui.loginscreen.LoginPresenter
 import kotlin.concurrent.thread
@@ -12,7 +13,7 @@ class LoginInteractorImpl(
 
     companion object {
         private const val LOGIN_DELAY = 1000L
-        private const val VERIFY_DELAY = 1000L
+        private const val VERIFY_DELAY = 3000L
         private const val CHANGE_PASSWORD_DELAY = 1000L
     }
 
@@ -21,8 +22,11 @@ class LoginInteractorImpl(
         Thread {
             handler.post {
                 callback.onLoading()
-                Thread.sleep(LOGIN_DELAY)
+            }
 
+            Thread.sleep(LOGIN_DELAY)
+
+            handler.post {
                 mockDatabaseApiImpl.checkUserCredentialsRequest(
                     login,
                     password,
@@ -49,8 +53,11 @@ class LoginInteractorImpl(
             handler.post {
 
                 callback.onLoading()
-                Thread.sleep(CHANGE_PASSWORD_DELAY)
+            }
 
+            Thread.sleep(CHANGE_PASSWORD_DELAY)
+
+            handler.post {
                 mockDatabaseApiImpl.changeUserPasswordRequest(
                     login,
                     newPassword,
@@ -68,13 +75,25 @@ class LoginInteractorImpl(
     }
 
     override fun verifyEmail(loginEmail: String, callback: VerifyEmailCallback) {
+
         Thread {
+
             handler.post {
+
                 callback.onLoading()
-                Thread.sleep(VERIFY_DELAY)
+
+            }
+
+            Thread.sleep(VERIFY_DELAY)
+
+            handler.post {
+
+                Log.d("THREAD", Thread.currentThread().toString())
+
                 mockDatabaseApiImpl.verifyEmail(loginEmail, object :
                     MockDatabaseApiImpl.OnVerifyEmailListener {
                     override fun verifySuccess() {
+
                         callback.onSuccess("Verify successful!")
                     }
 
