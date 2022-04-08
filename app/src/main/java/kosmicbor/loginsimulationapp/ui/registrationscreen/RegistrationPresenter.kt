@@ -25,42 +25,42 @@ class RegistrationPresenter : RegistrationContract.RegistrationPresenter {
         newPasswordRepeat: String
     ) {
 
-        Thread {
-
-            handler.post {
-                regView?.showProgress()
-
-
-                if (checkPasswordsConformity(newPassword, newPasswordRepeat)) {
-
-
-                    if (nickname.isNotEmpty() && newLogin.isNotEmpty() && newPassword.isNotEmpty()) {
-                        MockDatabaseApiImpl.addNewUserRequest(
-                            nickname,
-                            newLogin,
-                            newPassword,
-                            object : MockDatabaseApiImpl.OnUserCreateListener {
-                                override fun createSuccess() {
-                                    regView?.setSuccess()
-                                }
-
-                                override fun createError(error: String) {
-                                    regView?.setError(error)
-                                }
-
-                            })
-
-                    } else {
-                        regView?.showStandardScreen()
-                        regView?.setError("Please, fill all fields!")
-                    }
-
-                } else {
-                    regView?.showStandardScreen()
-                    regView?.setError("Passwords don't match!")
-                }
-            }
-        }.start()
+//        Thread {
+//
+//            handler.post {
+//                regView?.showProgress()
+//
+//
+//                if (checkPasswordsConformity(newPassword, newPasswordRepeat)) {
+//
+//
+//                    if (nickname.isNotEmpty() && newLogin.isNotEmpty() && newPassword.isNotEmpty()) {
+//                        MockDatabaseApiImpl.addNewUserRequest(
+//                            nickname,
+//                            newLogin,
+//                            newPassword,
+//                            object : MockDatabaseApiImpl.OnUserCreateListener {
+//                                override fun createSuccess() {
+//                                    regView?.setSuccess()
+//                                }
+//
+//                                override fun createError(error: String) {
+//                                    regView?.setError(error)
+//                                }
+//
+//                            })
+//
+//                    } else {
+//                        regView?.showStandardScreen()
+//                        regView?.setError("Please, fill all fields!")
+//                    }
+//
+//                } else {
+//                    regView?.showStandardScreen()
+//                    regView?.setError("Passwords don't match!")
+//                }
+//            }
+//        }.start()
     }
 
     private fun checkPasswordsConformity(newPassword: String, newPasswordRepeat: String): Boolean {

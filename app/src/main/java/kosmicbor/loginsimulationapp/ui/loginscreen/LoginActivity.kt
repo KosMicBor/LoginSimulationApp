@@ -13,6 +13,7 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
 import kosmicbor.loginsimulationapp.R
+import kosmicbor.loginsimulationapp.app
 import kosmicbor.loginsimulationapp.databinding.ActivityLoginBinding
 import kosmicbor.loginsimulationapp.ui.registrationscreen.RegisterActivity
 
@@ -21,6 +22,7 @@ class LoginActivity : AppCompatActivity(), LoginContract.LoginView {
     private lateinit var binding: ActivityLoginBinding
     private lateinit var presenter: LoginPresenter
     private lateinit var dialog: Dialog
+    private var snackbar: Snackbar? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,22 +31,24 @@ class LoginActivity : AppCompatActivity(), LoginContract.LoginView {
 
         dialog = Dialog(this)
 
+        snackbar = dialog.currentFocus?.let { Snackbar.make(it, "Verifying...", Snackbar.LENGTH_INDEFINITE) }
+
         presenter = restorePresenter()
 
         presenter.onAttach(this@LoginActivity)
 
-        binding.loginBtn.setOnClickListener {
+        binding.loginButton.setOnClickListener {
             presenter.onLogIn(
                 binding.loginFieldEditText.text.toString(),
                 binding.passwordFieldEditText.text.toString()
             )
         }
 
-        binding.createAccountBtn.setOnClickListener {
+        binding.createAccountButton.setOnClickListener {
             openRegisterActivity()
         }
 
-        binding.forgotPasswordBtn.setOnClickListener {
+        binding.forgotPasswordButton.setOnClickListener {
             showPasswordChangeDialog()
         }
     }
@@ -72,9 +76,9 @@ class LoginActivity : AppCompatActivity(), LoginContract.LoginView {
         binding.apply {
             loginFieldLayout.visibility = View.GONE
             passwordFieldLayout.visibility = View.GONE
-            createAccountBtn.visibility = View.GONE
-            loginBtn.visibility = View.GONE
-            forgotPasswordBtn.visibility = View.GONE
+            createAccountButton.visibility = View.GONE
+            loginButton.visibility = View.GONE
+            forgotPasswordButton.visibility = View.GONE
             loginScreenProgressbar.visibility = View.VISIBLE
         }
     }
@@ -83,9 +87,9 @@ class LoginActivity : AppCompatActivity(), LoginContract.LoginView {
         binding.apply {
             loginFieldLayout.visibility = View.VISIBLE
             passwordFieldLayout.visibility = View.VISIBLE
-            createAccountBtn.visibility = View.VISIBLE
-            loginBtn.visibility = View.VISIBLE
-            forgotPasswordBtn.visibility = View.VISIBLE
+            createAccountButton.visibility = View.VISIBLE
+            loginButton.visibility = View.VISIBLE
+            forgotPasswordButton.visibility = View.VISIBLE
             loginScreenProgressbar.visibility = View.GONE
         }
     }
@@ -98,10 +102,11 @@ class LoginActivity : AppCompatActivity(), LoginContract.LoginView {
 
             val loginEmail =
                 dialog.findViewById<TextInputEditText>(R.id.bottom_sheet_login_field_edit_text)
-            val verifyBtn = dialog.findViewById<MaterialButton>(R.id.send_verify_email_btn)
+            val verifyButton = dialog.findViewById<MaterialButton>(R.id.send_verify_email_button)
 
-            verifyBtn.setOnClickListener {
+            verifyButton.setOnClickListener {
                 presenter.onVerifyEmail(loginEmail.text.toString())
+                snackbar?.show()
             }
 
             window?.apply {
@@ -118,16 +123,17 @@ class LoginActivity : AppCompatActivity(), LoginContract.LoginView {
     override fun enableDialogPasswordChangeFields() {
         val loginEmail =
             dialog.findViewById<TextInputEditText>(R.id.bottom_sheet_login_field_edit_text)
-        val verifyBtn = dialog.findViewById<MaterialButton>(R.id.send_verify_email_btn)
+        val verifyButton = dialog.findViewById<MaterialButton>(R.id.send_verify_email_button)
         val newPassword =
             dialog.findViewById<TextInputEditText>(R.id.new_password_field_edit_text)
-        val changePasswordBtn = dialog.findViewById<MaterialButton>(R.id.change_password_btn)
+        val changePasswordButton = dialog.findViewById<MaterialButton>(R.id.change_password_button)
 
-        verifyBtn.isEnabled = false
+        verifyButton.isEnabled = false
+        snackbar?.dismiss()
         newPassword.isEnabled = true
-        changePasswordBtn.isEnabled = true
+        changePasswordButton.isEnabled = true
 
-        changePasswordBtn.setOnClickListener {
+        changePasswordButton.setOnClickListener {
             hideKeyboard(dialog.currentFocus)
             dialog.dismiss()
             presenter.onPasswordChanged(loginEmail.text.toString(), newPassword.text.toString())
@@ -162,7 +168,7 @@ class LoginActivity : AppCompatActivity(), LoginContract.LoginView {
 
     private fun restorePresenter(): LoginPresenter {
         val restoredPresenter = lastCustomNonConfigurationInstance as? LoginPresenter
-        return restoredPresenter ?: LoginPresenter()
+        return restoredPresenter ?: LoginPresenter(app.loginInteractor)
     }
 
     override fun onRetainCustomNonConfigurationInstance(): Any {

@@ -2,12 +2,15 @@ package kosmicbor.loginsimulationapp.ui.loginscreen
 
 import android.os.Handler
 import android.os.Looper
+import kosmicbor.loginsimulationapp.data.LoginInteractorImpl
 import kosmicbor.loginsimulationapp.data.MockDatabaseApiImpl
+import kosmicbor.loginsimulationapp.domain.LoginInteractor
 
-class LoginPresenter : LoginContract.Presenter {
+class LoginPresenter(
+    private val interactor: LoginInteractor
+) : LoginContract.Presenter {
 
     companion object {
-        private const val LOGIN_DELAY = 1000L
         private const val VERIFY_DELAY = 1000L
     }
 
@@ -26,75 +29,73 @@ class LoginPresenter : LoginContract.Presenter {
     }
 
     override fun onLogIn(login: String, password: String) {
-        Thread {
-            handler.post {
+        interactor.logIn(login, password, object : LoginInteractorImpl.LoginCallback {
+
+            override fun onSuccess() {
+                loginView?.apply {
+                    showStandardScreen()
+                    setSuccess()
+                    isSuccess = true
+                }
+            }
+
+            override fun onError(error: String) {
+                loginView?.apply {
+                    showStandardScreen()
+                    setError(error)
+                    isSuccess = false
+                }
+            }
+
+            override fun onLoading() {
                 loginView?.showProgress()
             }
-            Thread.sleep(LOGIN_DELAY)
-            MockDatabaseApiImpl.checkUserCredentialsRequest(
-                login,
-                password,
-                object : MockDatabaseApiImpl.OnUserLogInListener {
-                    override fun logInSuccess() {
-
-                        handler.post {
-                            loginView?.setSuccess()
-                        }
-
-                        isSuccess = true
-                    }
-
-                    override fun logInError(error: String) {
-                        handler.post {
-                            loginView?.setError(error)
-                        }
-                    }
-
-                })
-
-        }.start()
+        })
     }
 
     override fun onPasswordChanged(login: String, newPassword: String) {
-        Thread {
-            handler.post {
+        interactor.changePassword(
+            login,
+            newPassword,
+            object : LoginInteractorImpl.ChangePasswordCallback {
+                override fun onSuccess(message: String) {
+                    loginView?.apply {
+                        showStandardScreen()
+                        showMessage(message)
+                    }
+                }
 
-                MockDatabaseApiImpl.changeUserPasswordRequest(
-                    login,
-                    newPassword,
-                    object : MockDatabaseApiImpl.OnChangePasswordListener {
-                        override fun changeSuccess() {
-                            loginView?.showMessage("Password changed")
-                        }
+                override fun onError(error: String) {
+                    loginView?.apply {
+                        showStandardScreen()
+                        setError(error)
+                    }
+                }
 
-                        override fun changeError(error: String) {
-                            loginView?.setError(error)
-                        }
+                override fun onLoading() {
+                    loginView?.showProgress()
+                }
 
-                    })
-            }
-        }.start()
+            })
     }
 
     override fun onVerifyEmail(loginEmail: String) {
-        Thread {
-            handler.post {
-                loginView?.showProgress()
-                Thread.sleep(VERIFY_DELAY)
-
-                MockDatabaseApiImpl.verifyEmail(loginEmail, object :
-                    MockDatabaseApiImpl.OnVerifyEmailListener {
-                    override fun verifySuccess() {
-                        loginView?.showStandardScreen()
-                        loginView?.enableDialogPasswordChangeFields()
-
-                    }
-
-                    override fun verifyError(error: String) {
-                        loginView?.setError(error)
-                    }
-                })
+        interactor.verifyEmail(loginEmail, object : LoginInteractorImpl.VerifyEmailCallback {
+            override fun onSuccess(message: String) {
+                loginView?.apply {
+                    showStandardScreen()
+                    enableDialogPasswordChangeFields()
+                }
             }
-        }.start()
+
+            override fun onError(error: String) {
+                loginView?.setError(error)
+            }
+
+            override fun onLoading() {
+                //Nothing to do
+            }
+
+        })
     }
 }
