@@ -2,9 +2,12 @@ package kosmicbor.loginsimulationapp.ui.registrationscreen
 
 import android.os.Handler
 import android.os.Looper
-import kosmicbor.loginsimulationapp.data.DatabaseApi
+import kosmicbor.loginsimulationapp.data.RegistrationInteractorImpl
+import kosmicbor.loginsimulationapp.domain.RegistrationInteractor
 
-class RegistrationPresenter : RegistrationContract.RegistrationPresenter {
+class RegistrationPresenter(
+    private val interactor: RegistrationInteractor
+) : RegistrationContract.RegistrationPresenter {
 
     private val handler = Handler(Looper.myLooper() ?: Looper.getMainLooper())
     private var regView: RegistrationContract.RegistrationView? = null
@@ -30,22 +33,32 @@ class RegistrationPresenter : RegistrationContract.RegistrationPresenter {
             handler.post {
                 regView?.showProgress()
 
-
                 if (checkPasswordsConformity(newPassword, newPasswordRepeat)) {
 
 
                     if (nickname.isNotEmpty() && newLogin.isNotEmpty() && newPassword.isNotEmpty()) {
-                        DatabaseApi.addNewUserRequest(
+                        interactor.registerNewUser(
                             nickname,
                             newLogin,
                             newPassword,
-                            object : DatabaseApi.OnUserCreateListener {
-                                override fun createSuccess() {
-                                    regView?.setSuccess()
+                            object : RegistrationInteractorImpl.RegisterNewUserCallback {
+
+                                override fun onSuccess() {
+                                    regView?.apply {
+                                        showStandardScreen()
+                                        setSuccess()
+                                    }
                                 }
 
-                                override fun createError(error: String) {
-                                    regView?.setError(error)
+                                override fun onError(error: String) {
+                                    regView?.apply {
+                                        showStandardScreen()
+                                        setError(error)
+                                    }
+                                }
+
+                                override fun onLoading() {
+                                    regView?.showProgress()
                                 }
 
                             })

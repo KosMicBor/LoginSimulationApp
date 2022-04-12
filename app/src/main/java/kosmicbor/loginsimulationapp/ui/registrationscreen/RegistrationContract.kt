@@ -3,7 +3,7 @@ package kosmicbor.loginsimulationapp.ui.registrationscreen
 class RegistrationContract {
 
     interface RegistrationPresenter {
-        fun onAttach(RegistrationView: RegistrationView)
+        fun onAttach(registrationView: RegistrationView)
         fun onRegistration(
             nickname: String,
             newLogin: String,

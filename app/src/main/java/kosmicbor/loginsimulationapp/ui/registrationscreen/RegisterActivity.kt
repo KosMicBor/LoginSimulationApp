@@ -10,6 +10,7 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
+import kosmicbor.loginsimulationapp.app
 import kosmicbor.loginsimulationapp.ui.loginscreen.LoginActivity
 import kosmicbor.loginsimulationapp.databinding.ActivityRegisterBinding
 
@@ -25,11 +26,11 @@ class RegisterActivity : AppCompatActivity(), RegistrationContract.RegistrationV
 
         setContentView(binding.root)
 
-        presenter = RegistrationPresenter().apply {
+        presenter = RegistrationPresenter(app.registrationInteractor).apply {
             onAttach(this@RegisterActivity)
         }
 
-        binding.registerBtn.setOnClickListener {
+        binding.registerButton.setOnClickListener {
 
 
             presenter.apply {
@@ -77,7 +78,7 @@ class RegisterActivity : AppCompatActivity(), RegistrationContract.RegistrationV
             binding.newLoginFieldEditText.visibility = View.GONE
             binding.newPasswordFieldEditText.visibility = View.GONE
             binding.newPasswordRepeatFieldEditText.visibility = View.GONE
-            binding.registerBtn.visibility = View.GONE
+            binding.registerButton.visibility = View.GONE
             registerScreenProgressbar.visibility = View.VISIBLE
         }
     }
@@ -88,7 +89,7 @@ class RegisterActivity : AppCompatActivity(), RegistrationContract.RegistrationV
             binding.newLoginFieldEditText.visibility = View.VISIBLE
             binding.newPasswordFieldEditText.visibility = View.VISIBLE
             binding.newPasswordRepeatFieldEditText.visibility = View.VISIBLE
-            binding.registerBtn.visibility = View.VISIBLE
+            binding.registerButton.visibility = View.VISIBLE
             registerScreenProgressbar.visibility = View.GONE
         }
     }

@@ -54,7 +54,7 @@
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/login_btn"
+        android:id="@+id/login_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/login_btn_margin_top"
@@ -63,15 +63,15 @@
         app:layout_constraintTop_toBottomOf="@id/password_field_layout" />
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/create_account_btn"
+        android:id="@+id/create_account_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/create_account_btn_text"
         app:layout_constraintEnd_toEndOf="@id/password_field_layout"
-        app:layout_constraintTop_toTopOf="@id/login_btn" />
+        app:layout_constraintTop_toTopOf="@id/login_button" />
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/forgot_password_btn"
+        android:id="@+id/forgot_password_button"
         style="@style/Widget.AppCompat.Button.Borderless"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -79,6 +79,6 @@
         android:textAllCaps="false"
         android:textColor="@color/royal_blue"
         app:layout_constraintEnd_toEndOf="@id/password_field_layout"
-        app:layout_constraintTop_toBottomOf="@id/create_account_btn" />
+        app:layout_constraintTop_toBottomOf="@id/create_account_button" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

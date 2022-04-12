@@ -1,8 +1,10 @@
 package kosmicbor.loginsimulationapp.data
 
+import kosmicbor.loginsimulationapp.domain.LoginApi
+import kosmicbor.loginsimulationapp.domain.RegistrationApi
 import kosmicbor.loginsimulationapp.domain.User
 
-object DatabaseApi : LoginApi, RegistrationApi {
+class MockDatabaseApiImpl : LoginApi, RegistrationApi {
 
     private val usersList: MutableList<User> = mutableListOf()
 
@@ -57,6 +59,7 @@ object DatabaseApi : LoginApi, RegistrationApi {
 
     override fun verifyEmail(loginEmail: String, onVerifyEmailListener: OnVerifyEmailListener) {
         usersList.forEach {
+
             if (it.userLogin == loginEmail) {
                 onVerifyEmailListener.verifySuccess()
                 return
