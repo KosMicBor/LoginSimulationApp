@@ -229,4 +229,14 @@ class LoginActivity : AppCompatActivity() {
     override fun onRetainCustomNonConfigurationInstance(): Any {
         return viewModel
     }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        viewModel.isChangePasswordSuccess.unsubscribeAll()
+        viewModel.isVerifyEmailSuccess.unsubscribeAll()
+        viewModel.isError.unsubscribeAll()
+        viewModel.isLoginSuccess.unsubscribeAll()
+        viewModel.isInProgress.unsubscribeAll()
+        viewModel.isVerifyEmailError.unsubscribeAll()
+    }
 }

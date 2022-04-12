@@ -107,4 +107,11 @@ class RegisterActivity : AppCompatActivity() {
             registerScreenProgressbar.visibility = View.GONE
         }
     }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        viewModel.isInProgress.unsubscribeAll()
+        viewModel.isError.unsubscribeAll()
+        viewModel.isRegistrationSuccess.unsubscribeAll()
+    }
 }
