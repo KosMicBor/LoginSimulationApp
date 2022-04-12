@@ -16,8 +16,7 @@ class App : Application() {
     }
     val loginInteractor: LoginInteractor by lazy {
         LoginInteractorImpl(
-            app.databaseApi,
-            Handler(Looper.myLooper() ?: Looper.getMainLooper())
+            app.databaseApi
         )
     }
 
