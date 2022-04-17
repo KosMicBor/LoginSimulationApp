@@ -6,12 +6,11 @@ import android.content.Intent
 import android.graphics.Color
 import android.graphics.Rect
 import android.os.Bundle
-import android.provider.CalendarContract
-import android.provider.ContactsContract
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.*
 import android.view.inputmethod.InputMethodManager
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.snackbar.Snackbar
@@ -22,10 +21,11 @@ import kosmicbor.loginsimulationapp.databinding.ActivityLoginBinding
 import kosmicbor.loginsimulationapp.ui.registrationscreen.RegisterActivity
 import java.util.*
 
-class LoginActivity : AppCompatActivity(), LoginContract.LoginView {
+class LoginActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityLoginBinding
-    private lateinit var presenter: LoginPresenter
+    private lateinit var viewModel: LoginViewModel
+    private val handler = Handler(Looper.myLooper() ?: Looper.getMainLooper())
     private lateinit var dialog: Dialog
     private var verifySnackbar: Snackbar? = null
 
@@ -39,12 +39,37 @@ class LoginActivity : AppCompatActivity(), LoginContract.LoginView {
             setContentView(R.layout.bottomsheet_password_change)
         }
 
-        presenter = restorePresenter()
+        viewModel = restoreViewModel()
 
-        presenter.onAttach(this@LoginActivity)
+        viewModel.isInProgress.subscribe(handler) {
+            showProgress()
+        }
+
+        viewModel.isVerifyEmailInProgress.subscribe(handler) {
+            showDialogVerifyProgress()
+        }
+
+        viewModel.isLoginSuccess.subscribe(handler) {
+            showStandardScreen()
+            setSuccess()
+        }
+
+        viewModel.isChangePasswordSuccess.subscribe(handler) {
+            showStandardScreen()
+            it?.let { it1 -> showMessage(it1) }
+        }
+
+        viewModel.isVerifyEmailSuccess.subscribe(handler) {
+            enableDialogPasswordChangeFields()
+
+        }
+
+        viewModel.isError.subscribe(handler) {
+            it?.let { it1 -> setError(it1) }
+        }
 
         binding.loginButton.setOnClickListener {
-            presenter.onLogIn(
+            viewModel.logIn(
                 binding.loginFieldEditText.text.toString(),
                 binding.passwordFieldEditText.text.toString()
             )
@@ -64,12 +89,12 @@ class LoginActivity : AppCompatActivity(), LoginContract.LoginView {
         startActivity(intent)
     }
 
-    override fun setSuccess() {
+    private fun setSuccess() {
         binding.loginScreenProgressbar.visibility = View.GONE
         binding.root.setBackgroundColor(Color.GREEN)
     }
 
-    override fun setError(error: String) {
+    private fun setError(error: String) {
         if (dialog.isShowing) {
             dialog.currentFocus?.let {
                 Log.d("FOCUS", it.accessibilityClassName.toString())
@@ -81,7 +106,7 @@ class LoginActivity : AppCompatActivity(), LoginContract.LoginView {
         }
     }
 
-    override fun showProgress() {
+    private fun showProgress() {
         binding.apply {
             loginFieldLayout.visibility = View.GONE
             passwordFieldLayout.visibility = View.GONE
@@ -92,7 +117,7 @@ class LoginActivity : AppCompatActivity(), LoginContract.LoginView {
         }
     }
 
-    override fun showDialogVerifyProgress() {
+    private fun showDialogVerifyProgress() {
 
         Log.d("TIME", Calendar.getInstance().time.toString())
 
@@ -110,7 +135,7 @@ class LoginActivity : AppCompatActivity(), LoginContract.LoginView {
         }
     }
 
-    override fun showStandardScreen() {
+    private fun showStandardScreen() {
         binding.apply {
             loginFieldLayout.visibility = View.VISIBLE
             passwordFieldLayout.visibility = View.VISIBLE
@@ -121,7 +146,7 @@ class LoginActivity : AppCompatActivity(), LoginContract.LoginView {
         }
     }
 
-    override fun showPasswordChangeDialog() {
+    private fun showPasswordChangeDialog() {
 
         dialog.apply {
 
@@ -130,7 +155,7 @@ class LoginActivity : AppCompatActivity(), LoginContract.LoginView {
             val verifyButton = dialog.findViewById<MaterialButton>(R.id.send_verify_email_button)
 
             verifyButton.setOnClickListener {
-                presenter.onVerifyEmail(loginEmail.text.toString())
+                viewModel.verifyEmail(loginEmail.text.toString())
             }
 
             window?.apply {
@@ -144,7 +169,7 @@ class LoginActivity : AppCompatActivity(), LoginContract.LoginView {
         }
     }
 
-    override fun enableDialogPasswordChangeFields() {
+    private fun enableDialogPasswordChangeFields() {
         val loginEmail =
             dialog.findViewById<TextInputEditText>(R.id.bottom_sheet_login_field_edit_text)
         val verifyButton = dialog.findViewById<MaterialButton>(R.id.send_verify_email_button)
@@ -159,7 +184,7 @@ class LoginActivity : AppCompatActivity(), LoginContract.LoginView {
         changePasswordButton.isEnabled = true
 
         changePasswordButton.setOnClickListener {
-            presenter.onPasswordChanged(loginEmail.text.toString(), newPassword.text.toString())
+            viewModel.changePassword(loginEmail.text.toString(), newPassword.text.toString())
             hideKeyboard(dialog.currentFocus)
             verifyButton.isEnabled = true
             newPassword.isEnabled = false
@@ -170,7 +195,7 @@ class LoginActivity : AppCompatActivity(), LoginContract.LoginView {
         }
     }
 
-    override fun showMessage(message: String) {
+    private fun showMessage(message: String) {
         Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT).show()
     }
 
@@ -196,12 +221,22 @@ class LoginActivity : AppCompatActivity(), LoginContract.LoginView {
         imm.hideSoftInputFromWindow(view?.windowToken, 0)
     }
 
-    private fun restorePresenter(): LoginPresenter {
-        val restoredPresenter = lastCustomNonConfigurationInstance as? LoginPresenter
-        return restoredPresenter ?: LoginPresenter(app.loginInteractor)
+    private fun restoreViewModel(): LoginViewModel {
+        val restoredViewModel = lastCustomNonConfigurationInstance as? LoginViewModel
+        return restoredViewModel ?: LoginViewModel(app.loginInteractor)
     }
 
     override fun onRetainCustomNonConfigurationInstance(): Any {
-        return presenter
+        return viewModel
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        viewModel.isChangePasswordSuccess.unsubscribeAll()
+        viewModel.isVerifyEmailSuccess.unsubscribeAll()
+        viewModel.isError.unsubscribeAll()
+        viewModel.isLoginSuccess.unsubscribeAll()
+        viewModel.isInProgress.unsubscribeAll()
+        viewModel.isVerifyEmailError.unsubscribeAll()
     }
 }

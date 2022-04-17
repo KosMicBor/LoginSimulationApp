@@ -5,6 +5,8 @@ import android.content.Intent
 import android.graphics.Rect
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.MotionEvent
 import android.view.View
 import android.view.inputmethod.InputMethodManager
@@ -14,10 +16,11 @@ import kosmicbor.loginsimulationapp.app
 import kosmicbor.loginsimulationapp.ui.loginscreen.LoginActivity
 import kosmicbor.loginsimulationapp.databinding.ActivityRegisterBinding
 
-class RegisterActivity : AppCompatActivity(), RegistrationContract.RegistrationView {
+class RegisterActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityRegisterBinding
-    private lateinit var presenter: RegistrationContract.RegistrationPresenter
+    private lateinit var viewModel: RegistrationContract.RegistrationViewModel
+    private val handler = Handler(Looper.myLooper() ?: Looper.getMainLooper())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,14 +29,25 @@ class RegisterActivity : AppCompatActivity(), RegistrationContract.RegistrationV
 
         setContentView(binding.root)
 
-        presenter = RegistrationPresenter(app.registrationInteractor).apply {
-            onAttach(this@RegisterActivity)
+        viewModel = RegistrationViewModel(app.registrationInteractor)
+
+        viewModel.isInProgress.subscribe(handler) {
+            showProgress()
+        }
+
+        viewModel.isRegistrationSuccess.subscribe(handler) {
+            showStandardScreen()
+            setSuccess()
+        }
+
+        viewModel.isError.subscribe(handler) {
+            it?.let { it1 -> setError(it1) }
         }
 
         binding.registerButton.setOnClickListener {
 
 
-            presenter.apply {
+            viewModel.apply {
 
                 onRegistration(
                     binding.newNameFieldEditText.text.toString(),
@@ -62,17 +76,17 @@ class RegisterActivity : AppCompatActivity(), RegistrationContract.RegistrationV
         return super.dispatchTouchEvent(ev)
     }
 
-    override fun setSuccess() {
+    private fun setSuccess() {
         val intent = Intent(this, LoginActivity::class.java)
         startActivity(intent)
     }
 
-    override fun setError(error: String) {
+    private fun setError(error: String) {
         showStandardScreen()
         Snackbar.make(binding.root, error, Snackbar.LENGTH_SHORT).show()
     }
 
-    override fun showProgress() {
+    private fun showProgress() {
         binding.apply {
             binding.newNameFieldEditText.visibility = View.GONE
             binding.newLoginFieldEditText.visibility = View.GONE
@@ -83,7 +97,7 @@ class RegisterActivity : AppCompatActivity(), RegistrationContract.RegistrationV
         }
     }
 
-    override fun showStandardScreen() {
+    private fun showStandardScreen() {
         binding.apply {
             binding.newNameFieldEditText.visibility = View.VISIBLE
             binding.newLoginFieldEditText.visibility = View.VISIBLE
@@ -92,5 +106,12 @@ class RegisterActivity : AppCompatActivity(), RegistrationContract.RegistrationV
             binding.registerButton.visibility = View.VISIBLE
             registerScreenProgressbar.visibility = View.GONE
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        viewModel.isInProgress.unsubscribeAll()
+        viewModel.isError.unsubscribeAll()
+        viewModel.isRegistrationSuccess.unsubscribeAll()
     }
 }

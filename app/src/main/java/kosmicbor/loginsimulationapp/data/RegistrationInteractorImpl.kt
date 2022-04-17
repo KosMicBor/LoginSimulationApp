@@ -5,7 +5,6 @@ import kosmicbor.loginsimulationapp.domain.RegistrationInteractor
 
 class RegistrationInteractorImpl(
     private val databaseApiImpl: MockDatabaseApiImpl,
-    private val handler: Handler
 ) : RegistrationInteractor {
 
     companion object {
@@ -20,27 +19,23 @@ class RegistrationInteractorImpl(
     ) {
         Thread {
 
-            handler.post {
-                callback.onLoading()
-            }
+            callback.onLoading()
 
             Thread.sleep(REGISTRATION_REQUEST_DELAY)
 
-            handler.post {
-                databaseApiImpl.addNewUserRequest(nickname, newLogin, newPassword, object :
-                    MockDatabaseApiImpl.OnUserCreateListener {
+            databaseApiImpl.addNewUserRequest(nickname, newLogin, newPassword, object :
+                MockDatabaseApiImpl.OnUserCreateListener {
 
-                    override fun createSuccess() {
-                        callback.onSuccess()
-                    }
+                override fun createSuccess() {
+                    callback.onSuccess()
+                }
 
-                    override fun createError(error: String) {
-                        callback.onError(error)
-                    }
+                override fun createError(error: String) {
+                    callback.onError(error)
+                }
 
-                })
+            })
 
-            }
 
         }.start()
     }

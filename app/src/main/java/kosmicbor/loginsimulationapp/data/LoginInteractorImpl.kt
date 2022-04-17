@@ -3,12 +3,9 @@ package kosmicbor.loginsimulationapp.data
 import android.os.Handler
 import android.util.Log
 import kosmicbor.loginsimulationapp.domain.LoginInteractor
-import kosmicbor.loginsimulationapp.ui.loginscreen.LoginPresenter
-import kotlin.concurrent.thread
 
 class LoginInteractorImpl(
     private val mockDatabaseApiImpl: MockDatabaseApiImpl,
-    private val handler: Handler
 ) : LoginInteractor {
 
     companion object {
@@ -20,26 +17,24 @@ class LoginInteractorImpl(
     override fun logIn(login: String, password: String, callback: LoginCallback) {
 
         Thread {
-            handler.post {
-                callback.onLoading()
-            }
+
+            callback.onLoading()
 
             Thread.sleep(LOGIN_DELAY)
 
-            handler.post {
-                mockDatabaseApiImpl.checkUserCredentialsRequest(
-                    login,
-                    password,
-                    object : MockDatabaseApiImpl.OnUserLogInListener {
-                        override fun logInSuccess() {
-                            callback.onSuccess()
-                        }
+            mockDatabaseApiImpl.checkUserCredentialsRequest(
+                login,
+                password,
+                object : MockDatabaseApiImpl.OnUserLogInListener {
+                    override fun logInSuccess() {
+                        callback.onSuccess()
+                    }
 
-                        override fun logInError(error: String) {
-                            callback.onError(error)
-                        }
-                    })
-            }
+                    override fun logInError(error: String) {
+                        callback.onError(error)
+                    }
+                })
+
         }.start()
     }
 
@@ -50,27 +45,26 @@ class LoginInteractorImpl(
     ) {
 
         Thread {
-            handler.post {
 
-                callback.onLoading()
-            }
+            callback.onLoading()
+
 
             Thread.sleep(CHANGE_PASSWORD_DELAY)
 
-            handler.post {
-                mockDatabaseApiImpl.changeUserPasswordRequest(
-                    login,
-                    newPassword,
-                    object : MockDatabaseApiImpl.OnChangePasswordListener {
-                        override fun changeSuccess() {
-                            callback.onSuccess("Password changed")
-                        }
 
-                        override fun changeError(error: String) {
-                            callback.onError(error)
-                        }
-                    })
-            }
+            mockDatabaseApiImpl.changeUserPasswordRequest(
+                login,
+                newPassword,
+                object : MockDatabaseApiImpl.OnChangePasswordListener {
+                    override fun changeSuccess() {
+                        callback.onSuccess("Password changed")
+                    }
+
+                    override fun changeError(error: String) {
+                        callback.onError(error)
+                    }
+                })
+
         }.start()
     }
 
@@ -78,30 +72,22 @@ class LoginInteractorImpl(
 
         Thread {
 
-            handler.post {
-
-                callback.onLoading()
-
-            }
+            callback.onLoading()
 
             Thread.sleep(VERIFY_DELAY)
 
-            handler.post {
+            mockDatabaseApiImpl.verifyEmail(loginEmail, object :
+                MockDatabaseApiImpl.OnVerifyEmailListener {
+                override fun verifySuccess() {
 
-                Log.d("THREAD", Thread.currentThread().toString())
+                    callback.onSuccess("Verify successful!")
+                }
 
-                mockDatabaseApiImpl.verifyEmail(loginEmail, object :
-                    MockDatabaseApiImpl.OnVerifyEmailListener {
-                    override fun verifySuccess() {
+                override fun verifyError(error: String) {
+                    callback.onError(error)
+                }
+            })
 
-                        callback.onSuccess("Verify successful!")
-                    }
-
-                    override fun verifyError(error: String) {
-                        callback.onError(error)
-                    }
-                })
-            }
         }.start()
     }
 
