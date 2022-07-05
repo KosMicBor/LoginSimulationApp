@@ -3,8 +3,6 @@ package kosmicbor.loginsimulationapp.data
 import android.os.Handler
 import android.util.Log
 import kosmicbor.loginsimulationapp.domain.LoginInteractor
-import kosmicbor.loginsimulationapp.ui.loginscreen.LoginPresenter
-import kotlin.concurrent.thread
 
 class LoginInteractorImpl(
     private val mockDatabaseApiImpl: MockDatabaseApiImpl,

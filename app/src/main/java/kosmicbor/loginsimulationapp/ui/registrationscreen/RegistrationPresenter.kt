@@ -1,15 +1,14 @@
 package kosmicbor.loginsimulationapp.ui.registrationscreen
 
 import android.os.Handler
-import android.os.Looper
 import kosmicbor.loginsimulationapp.data.RegistrationInteractorImpl
 import kosmicbor.loginsimulationapp.domain.RegistrationInteractor
 
 class RegistrationPresenter(
-    private val interactor: RegistrationInteractor
+    private val interactor: RegistrationInteractor,
+    private val handler: Handler
 ) : RegistrationContract.RegistrationPresenter {
 
-    private val handler = Handler(Looper.myLooper() ?: Looper.getMainLooper())
     private var regView: RegistrationContract.RegistrationView? = null
     private var isSuccess = false
 
@@ -34,7 +33,6 @@ class RegistrationPresenter(
                 regView?.showProgress()
 
                 if (checkPasswordsConformity(newPassword, newPasswordRepeat)) {
-
 
                     if (nickname.isNotEmpty() && newLogin.isNotEmpty() && newPassword.isNotEmpty()) {
                         interactor.registerNewUser(
@@ -76,7 +74,7 @@ class RegistrationPresenter(
         }.start()
     }
 
-    private fun checkPasswordsConformity(newPassword: String, newPasswordRepeat: String): Boolean {
+    override fun checkPasswordsConformity(newPassword: String, newPasswordRepeat: String): Boolean {
         return newPassword == newPasswordRepeat
     }
 }

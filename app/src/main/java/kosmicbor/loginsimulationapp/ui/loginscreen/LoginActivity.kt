@@ -6,6 +6,8 @@ import android.content.Intent
 import android.graphics.Color
 import android.graphics.Rect
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.provider.CalendarContract
 import android.provider.ContactsContract
 import android.util.Log
@@ -28,6 +30,8 @@ class LoginActivity : AppCompatActivity(), LoginContract.LoginView {
     private lateinit var presenter: LoginPresenter
     private lateinit var dialog: Dialog
     private var verifySnackbar: Snackbar? = null
+
+    private val handler = Handler(Looper.myLooper() ?: Looper.getMainLooper())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -198,7 +202,7 @@ class LoginActivity : AppCompatActivity(), LoginContract.LoginView {
 
     private fun restorePresenter(): LoginPresenter {
         val restoredPresenter = lastCustomNonConfigurationInstance as? LoginPresenter
-        return restoredPresenter ?: LoginPresenter(app.loginInteractor)
+        return restoredPresenter ?: LoginPresenter(app.loginInteractor, handler)
     }
 
     override fun onRetainCustomNonConfigurationInstance(): Any {
