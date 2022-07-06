@@ -56,6 +56,7 @@ class LoginInteractorImpl(
             Thread.sleep(CHANGE_PASSWORD_DELAY)
 
             handler.post {
+
                 mockDatabaseApiImpl.changeUserPasswordRequest(
                     login,
                     newPassword,

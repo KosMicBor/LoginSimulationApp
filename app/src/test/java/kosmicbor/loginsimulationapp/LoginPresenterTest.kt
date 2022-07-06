@@ -2,6 +2,7 @@ package kosmicbor.loginsimulationapp
 
 import android.os.Handler
 import junit.framework.Assert.assertFalse
+import junit.framework.Assert.assertTrue
 import kosmicbor.loginsimulationapp.data.LoginInteractorImpl
 import kosmicbor.loginsimulationapp.domain.LoginInteractor
 import kosmicbor.loginsimulationapp.ui.loginscreen.LoginContract
@@ -20,6 +21,8 @@ class LoginPresenterTest {
 
     private val password = "password"
 
+    private val newPassword = "new password"
+
     @Mock
     private lateinit var loginInteractor: LoginInteractor
 
@@ -28,9 +31,6 @@ class LoginPresenterTest {
 
     @Mock
     private lateinit var view: LoginContract.LoginView
-
-    @Mock
-    private lateinit var loginCallback: LoginInteractorImpl.LoginCallback
 
     private lateinit var loginPresenter: LoginPresenter
 
@@ -59,41 +59,82 @@ class LoginPresenterTest {
     @Test
     fun loginPresenter_OnLogIn_Response_Success_Test() {
 
-        loginPresenter.onLogIn(login, password)
-
         whenever(
             loginInteractor.logIn(
-                anyString(),
-                anyString(),
-                any()
+                login = anyString(),
+                password = anyString(),
+                callback = any()
             )
         ).thenAnswer {
-            val answer = it.arguments[0] as LoginInteractorImpl.LoginCallback
+            val answer = it.arguments[2] as LoginInteractorImpl.LoginCallback
             return@thenAnswer answer.onSuccess()
         }
 
+        loginPresenter.onLogIn(login, password)
+
+        verify(view).showStandardScreen()
         verify(view).setSuccess()
+        assertTrue(loginPresenter.isSuccess)
     }
 
     @Test
     fun loginPresenter_OnLogIn_Response_Loading_Test() {
 
+        whenever(
+            loginInteractor.logIn(
+                login = anyString(),
+                password = anyString(),
+                callback = any()
+            )
+        ).thenAnswer {
+            val answer = it.arguments[2] as LoginInteractorImpl.LoginCallback
+            return@thenAnswer answer.onLoading()
+        }
+
         loginPresenter.onLogIn(login, password)
 
-        `when`(loginCallback.onLoading()).then {
-            verify(view, times(1)).showProgress()
-        }
+        verify(view).showProgress()
     }
 
     @Test
     fun loginPresenter_OnLogIn_Response_Error_Test() {
 
+        whenever(
+            loginInteractor.logIn(
+                login = anyString(),
+                password = anyString(),
+                callback = any()
+            )
+        ).thenAnswer {
+            val answer = it.arguments[2] as LoginInteractorImpl.LoginCallback
+            return@thenAnswer answer.onError("Error")
+        }
+
         loginPresenter.onLogIn(login, password)
 
-        `when`(loginCallback.onError(anyString())).then {
-            verify(view, times(1)).showStandardScreen()
-            verify(view, times(1)).setError(anyString())
-            assertFalse("Successful state must became false", loginPresenter.isSuccess)
-        }
+        verify(view).showStandardScreen()
+        verify(view).setError(anyString())
+        assertFalse(loginPresenter.isSuccess)
+    }
+
+    @Test
+    fun loginPresenter_OnPasswordChanged_Test(){
+        loginPresenter.onPasswordChanged(password, newPassword)
+
+        verify(loginInteractor, times(1)).changePassword(
+            login = anyString(),
+            newPassword = anyString(),
+            callback = any()
+        )
+    }
+
+    @Test
+    fun loginPresenter_OnVerifyEmail_Test(){
+        loginPresenter.onVerifyEmail(login)
+
+        verify(loginInteractor, times(1)).verifyEmail(
+            loginEmail = anyString(),
+            callback = any()
+        )
     }
 }

@@ -27,51 +27,47 @@ class RegistrationPresenter(
         newPasswordRepeat: String
     ) {
 
-        Thread {
+        handler.post {
 
-            handler.post {
-                regView?.showProgress()
+            if (checkPasswordsConformity(newPassword, newPasswordRepeat)) {
 
-                if (checkPasswordsConformity(newPassword, newPasswordRepeat)) {
+                if (nickname.isNotEmpty() && newLogin.isNotEmpty() && newPassword.isNotEmpty()) {
+                    interactor.registerNewUser(
+                        nickname,
+                        newLogin,
+                        newPassword,
+                        object : RegistrationInteractorImpl.RegisterNewUserCallback {
 
-                    if (nickname.isNotEmpty() && newLogin.isNotEmpty() && newPassword.isNotEmpty()) {
-                        interactor.registerNewUser(
-                            nickname,
-                            newLogin,
-                            newPassword,
-                            object : RegistrationInteractorImpl.RegisterNewUserCallback {
-
-                                override fun onSuccess() {
-                                    regView?.apply {
-                                        showStandardScreen()
-                                        setSuccess()
-                                    }
+                            override fun onSuccess() {
+                                regView?.apply {
+                                    showStandardScreen()
+                                    setSuccess()
                                 }
+                            }
 
-                                override fun onError(error: String) {
-                                    regView?.apply {
-                                        showStandardScreen()
-                                        setError(error)
-                                    }
+                            override fun onError(error: String) {
+                                regView?.apply {
+                                    showStandardScreen()
+                                    setError(error)
                                 }
+                            }
 
-                                override fun onLoading() {
-                                    regView?.showProgress()
-                                }
+                            override fun onLoading() {
+                                regView?.showProgress()
+                            }
 
-                            })
-
-                    } else {
-                        regView?.showStandardScreen()
-                        regView?.setError("Please, fill all fields!")
-                    }
+                        })
 
                 } else {
                     regView?.showStandardScreen()
-                    regView?.setError("Passwords don't match!")
+                    regView?.setError("Please, fill all fields!")
                 }
+
+            } else {
+                regView?.showStandardScreen()
+                regView?.setError("Passwords don't match!")
             }
-        }.start()
+        }
     }
 
     override fun checkPasswordsConformity(newPassword: String, newPasswordRepeat: String): Boolean {
