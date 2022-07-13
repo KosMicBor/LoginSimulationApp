@@ -1,15 +1,14 @@
 package kosmicbor.loginsimulationapp.ui.registrationscreen
 
 import android.os.Handler
-import android.os.Looper
 import kosmicbor.loginsimulationapp.data.RegistrationInteractorImpl
 import kosmicbor.loginsimulationapp.domain.RegistrationInteractor
 
 class RegistrationPresenter(
-    private val interactor: RegistrationInteractor
+    private val interactor: RegistrationInteractor,
+    private val handler: Handler
 ) : RegistrationContract.RegistrationPresenter {
 
-    private val handler = Handler(Looper.myLooper() ?: Looper.getMainLooper())
     private var regView: RegistrationContract.RegistrationView? = null
     private var isSuccess = false
 
@@ -28,55 +27,50 @@ class RegistrationPresenter(
         newPasswordRepeat: String
     ) {
 
-        Thread {
+        handler.post {
 
-            handler.post {
-                regView?.showProgress()
+            if (checkPasswordsConformity(newPassword, newPasswordRepeat)) {
 
-                if (checkPasswordsConformity(newPassword, newPasswordRepeat)) {
+                if (nickname.isNotEmpty() && newLogin.isNotEmpty() && newPassword.isNotEmpty()) {
+                    interactor.registerNewUser(
+                        nickname,
+                        newLogin,
+                        newPassword,
+                        object : RegistrationInteractorImpl.RegisterNewUserCallback {
 
-
-                    if (nickname.isNotEmpty() && newLogin.isNotEmpty() && newPassword.isNotEmpty()) {
-                        interactor.registerNewUser(
-                            nickname,
-                            newLogin,
-                            newPassword,
-                            object : RegistrationInteractorImpl.RegisterNewUserCallback {
-
-                                override fun onSuccess() {
-                                    regView?.apply {
-                                        showStandardScreen()
-                                        setSuccess()
-                                    }
+                            override fun onSuccess() {
+                                regView?.apply {
+                                    showStandardScreen()
+                                    setSuccess()
                                 }
+                            }
 
-                                override fun onError(error: String) {
-                                    regView?.apply {
-                                        showStandardScreen()
-                                        setError(error)
-                                    }
+                            override fun onError(error: String) {
+                                regView?.apply {
+                                    showStandardScreen()
+                                    setError(error)
                                 }
+                            }
 
-                                override fun onLoading() {
-                                    regView?.showProgress()
-                                }
+                            override fun onLoading() {
+                                regView?.showProgress()
+                            }
 
-                            })
-
-                    } else {
-                        regView?.showStandardScreen()
-                        regView?.setError("Please, fill all fields!")
-                    }
+                        })
 
                 } else {
                     regView?.showStandardScreen()
-                    regView?.setError("Passwords don't match!")
+                    regView?.setError("Please, fill all fields!")
                 }
+
+            } else {
+                regView?.showStandardScreen()
+                regView?.setError("Passwords don't match!")
             }
-        }.start()
+        }
     }
 
-    private fun checkPasswordsConformity(newPassword: String, newPasswordRepeat: String): Boolean {
+    override fun checkPasswordsConformity(newPassword: String, newPasswordRepeat: String): Boolean {
         return newPassword == newPasswordRepeat
     }
 }

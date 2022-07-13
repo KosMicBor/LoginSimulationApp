@@ -1,22 +1,18 @@
 package kosmicbor.loginsimulationapp.ui.loginscreen
 
 import android.os.Handler
-import android.os.Looper
 import androidx.annotation.MainThread
 import kosmicbor.loginsimulationapp.data.LoginInteractorImpl
 import kosmicbor.loginsimulationapp.domain.LoginInteractor
 
 class LoginPresenter(
-    private val interactor: LoginInteractor
+    private val interactor: LoginInteractor,
+    private val handler: Handler
 ) : LoginContract.Presenter {
 
-    companion object {
-        private const val VERIFY_DELAY = 1000L
-    }
-
-    private val handler = Handler(Looper.myLooper() ?: Looper.getMainLooper())
     private var loginView: LoginContract.LoginView? = null
-    private var isSuccess = false
+    var isSuccess = false
+        private set
 
     override fun onAttach(loginView: LoginContract.LoginView) {
         this.loginView = loginView
@@ -54,6 +50,7 @@ class LoginPresenter(
     }
 
     override fun onPasswordChanged(login: String, newPassword: String) {
+
         interactor.changePassword(
             login,
             newPassword,
@@ -98,7 +95,6 @@ class LoginPresenter(
             override fun onLoading() {
                 loginView?.showDialogVerifyProgress()
             }
-
         })
     }
 }

@@ -10,6 +10,8 @@ class RegistrationContract {
             newPassword: String,
             newPasswordRepeat: String
         )
+
+        fun checkPasswordsConformity(newPassword: String, newPasswordRepeat: String): Boolean
     }
 
     interface RegistrationView {
